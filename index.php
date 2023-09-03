@@ -1,5 +1,7 @@
 <?php
 /**
+ * TradingView Webhook to Binance order v0.1
+ *
  * This is a simple script which is used to handle http request of tradingview webhook.
  * in the body of the request, there is a json string which contains the tradingview alert data.
  * this script will open a market order on binance based on the alert data.
@@ -25,8 +27,9 @@ alert data is a json string, it contains the following fields:
 данные сигнала - это строка json, она содержит следующие поля:
 
 {
-    "symbol": "TOMOUSDT",
+    "symbol": "BTCUSDT",
     "position": "SHORT" // на продажу, LONG - на покупку
+    "quantity": 5 // необязательно количество USDT, на которое открыть ордер
 }
 */
 $alertData = json_decode(file_get_contents('php://input'), true);
@@ -45,17 +48,21 @@ if(!in_array($alertData['position'], [PositionSidesEnum::LONG, PositionSidesEnum
     die('invalid position');
 }
 
-// open market order
+// create binance api instance
 $binanceApi = new BinanceApi(
     $config['binance_api_key'],
     $config['binance_api_secret'],
     $config['binance_base_url'],
 );
 
+// if quantity is passed in alert data, use it instead of config value
+$quantity = $alertData['quantity'] ?? $config['order_quantity'];
+
+// open market order
 $result = $binanceApi->openMarketOrder(
     $alertData['symbol'],
     $alertData['position'],
-    $config['order_quantity'],
+    $quantity
 );
 
 echo '<pre>';
