@@ -4,7 +4,7 @@ Written by request of my friend, who couldn't find anything suitable on the Inte
 Do not use it in production, it's just a simple example.
 
 Requirements:
-- php 8.1 or higher with curl extension
+- php 7.4 or higher with curl extension
 
 Installation:
 - clone this repo to your server
@@ -19,7 +19,7 @@ Installation:
 Не используйте его в продакшене, это просто пример.
 
 Требования:
-- php 8.1 или выше с расширением curl
+- php 7.4 или выше с расширением curl
 
 Установка:
 - клонируйте этот репозиторий на ваш сервер

@@ -3,12 +3,19 @@
 class BinanceApi
 {
 
+    public string $apiKey;
+        public string $secretKey;
+        public string $apiBaseUrl;
+
     public function __construct(
-        public string $apiKey,
-        public string $secretKey,
-        public string $apiBaseUrl,
+        string $apiKey,
+        string $secretKey,
+        string $apiBaseUrl
     )
     {
+        $this->apiKey = $apiKey;
+        $this->secretKey = $secretKey;
+        $this->apiBaseUrl = $apiBaseUrl;
     }
 
     public function openMarketOrder(string $symbol, string $side, float $quantity)
