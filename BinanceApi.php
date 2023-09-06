@@ -20,14 +20,31 @@ class BinanceApi
 
     public function openMarketOrder(string $symbol, string $side, float $quantity)
     {
-        $timestamp = $this->getTimestamp();
+        //$timestamp = $this->getTimestamp();
+        $markPriceInfo = $this->getMarkPriceInfo($symbol);
+        $markPrice = $markPriceInfo['markPrice'];
+        $timestamp = $markPriceInfo['time'];
+
+        // calculate quantity based on mark price
+        $quantityInSymbol = round($quantity / $markPrice);
+        // In case if price is greater than quantity, increase precision
+        $precision = 1;
+        while ($quantityInSymbol == 0) {
+            $precision++;
+            $quantityInSymbol = round($quantity / $markPrice, $precision);
+        }
+
+        echo 'markPrice: ' . $markPrice . PHP_EOL;
+        echo 'quantity in USDT: ' . $quantity . PHP_EOL;
+        echo 'quantity in SYMBOL: ' . $quantityInSymbol . PHP_EOL;
+
         $url = '/order';
         $params = [
             'symbol' => $symbol,
             'side' => $side === PositionSidesEnum::SHORT ? SidesEnum::SELL : SidesEnum::BUY,
             'type' => 'MARKET',
             'positionSide' => $side,
-            'quantity' => $quantity,
+            'quantity' => $quantityInSymbol,
             'timestamp' => $timestamp,
         ];
         $params['signature'] = $this->getSignature($params);
@@ -66,6 +83,15 @@ class BinanceApi
         return hash_hmac('sha256', $query, $this->secretKey);
     }
 
+    public function getMarkPriceInfo(string $symbol): ?array
+    {
+        $url = '/premiumIndex';
+        $params = [
+            'symbol' => $symbol,
+        ];
+
+        return  $this->sendRequest('GET', $url, $params);
+    }
 
 
 }
